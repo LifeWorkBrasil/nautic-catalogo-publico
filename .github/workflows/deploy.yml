@@ -38,6 +38,18 @@ jobs:
         with:
           path: dist
 
+      - name: Deploy para KingHost (barcosebarcos.com.br/catalogo)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.KINGHOST_FTP_SERVER }}
+          username: ${{ secrets.KINGHOST_FTP_USERNAME }}
+          password: ${{ secrets.KINGHOST_FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: /www/catalogo/
+          exclude: |
+            **/404.html
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
