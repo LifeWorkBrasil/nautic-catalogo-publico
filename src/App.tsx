@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Building2 } from 'lucide-react'
-import { listCategorias, listSubcategorias, listProdutos, getEmpresaConfig } from './lib/api'
+import { listCategorias, listSubcategorias, listGrupos, listProdutos, getEmpresaConfig } from './lib/api'
 import { montarMensagem, linkWhatsapp } from './lib/whatsapp'
 import ProdutoCard from './components/ProdutoCard'
 import ProdutoDetalhe from './components/ProdutoDetalhe'
 import SelecaoBar from './components/SelecaoBar'
-import type { CategoriaProduto, SubcategoriaProduto, ProdutoPublico, EmpresaConfig } from './types'
+import type {
+  CategoriaProduto,
+  SubcategoriaProduto,
+  GrupoProduto,
+  ProdutoPublico,
+  EmpresaConfig,
+} from './types'
 
 export default function App() {
   const [carregando, setCarregando] = useState(true)
@@ -13,25 +19,29 @@ export default function App() {
 
   const [categorias, setCategorias] = useState<CategoriaProduto[]>([])
   const [subcategorias, setSubcategorias] = useState<SubcategoriaProduto[]>([])
+  const [grupos, setGrupos] = useState<GrupoProduto[]>([])
   const [produtos, setProdutos] = useState<ProdutoPublico[]>([])
   const [empresa, setEmpresa] = useState<EmpresaConfig | null>(null)
 
   const [categoriaAtivaId, setCategoriaAtivaId] = useState<string | null>(null)
   const [subcategoriaAtivaId, setSubcategoriaAtivaId] = useState<string | null>(null)
+  const [grupoAtivoId, setGrupoAtivoId] = useState<string | null>(null)
   const [produtoAbertoId, setProdutoAbertoId] = useState<string | null>(null)
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     async function carregar() {
       try {
-        const [c, s, p, e] = await Promise.all([
+        const [c, s, g, p, e] = await Promise.all([
           listCategorias(),
           listSubcategorias(),
+          listGrupos(),
           listProdutos(),
           getEmpresaConfig(),
         ])
         setCategorias(c)
         setSubcategorias(s)
+        setGrupos(g)
         setProdutos(p)
         setEmpresa(e)
         setCategoriaAtivaId((atual) => atual ?? c[0]?.id ?? null)
@@ -49,14 +59,20 @@ export default function App() {
     [subcategorias, categoriaAtivaId]
   )
 
+  const gruposDaSubcategoriaAtiva = useMemo(
+    () => grupos.filter((g) => g.subcategoria_id === subcategoriaAtivaId),
+    [grupos, subcategoriaAtivaId]
+  )
+
   const produtosVisiveis = useMemo(() => {
     const idsSubcategoriasDaCategoria = new Set(subcategoriasDaCategoria.map((s) => s.id))
     return produtos.filter((p) => {
       if (!idsSubcategoriasDaCategoria.has(p.subcategoria_id)) return false
-      if (subcategoriaAtivaId) return p.subcategoria_id === subcategoriaAtivaId
+      if (subcategoriaAtivaId && p.subcategoria_id !== subcategoriaAtivaId) return false
+      if (grupoAtivoId && p.grupo_id !== grupoAtivoId) return false
       return true
     })
-  }, [produtos, subcategoriasDaCategoria, subcategoriaAtivaId])
+  }, [produtos, subcategoriasDaCategoria, subcategoriaAtivaId, grupoAtivoId])
 
   const produtoAberto = produtos.find((p) => p.id === produtoAbertoId) ?? null
   const subcategoriaDoProdutoAberto = subcategorias.find(
@@ -116,6 +132,7 @@ export default function App() {
               onClick={() => {
                 setCategoriaAtivaId(c.id)
                 setSubcategoriaAtivaId(null)
+                setGrupoAtivoId(null)
               }}
               className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                 categoriaAtivaId === c.id
@@ -131,7 +148,10 @@ export default function App() {
         {subcategoriasDaCategoria.length > 0 && (
           <div className="mb-6 flex flex-wrap gap-2">
             <button
-              onClick={() => setSubcategoriaAtivaId(null)}
+              onClick={() => {
+                setSubcategoriaAtivaId(null)
+                setGrupoAtivoId(null)
+              }}
               className={`rounded-full border px-3 py-1 text-xs transition-colors ${
                 subcategoriaAtivaId === null
                   ? 'border-brass-500 bg-brass-200/30 text-hull-900'
@@ -143,7 +163,10 @@ export default function App() {
             {subcategoriasDaCategoria.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setSubcategoriaAtivaId(s.id)}
+                onClick={() => {
+                  setSubcategoriaAtivaId(s.id)
+                  setGrupoAtivoId(null)
+                }}
                 className={`rounded-full border px-3 py-1 text-xs transition-colors ${
                   subcategoriaAtivaId === s.id
                     ? 'border-brass-500 bg-brass-200/30 text-hull-900'
@@ -151,6 +174,34 @@ export default function App() {
                 }`}
               >
                 {s.nome}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {subcategoriaAtivaId && gruposDaSubcategoriaAtiva.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            <button
+              onClick={() => setGrupoAtivoId(null)}
+              className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                grupoAtivoId === null
+                  ? 'border-brass-500 bg-brass-200/30 text-hull-900'
+                  : 'border-foam-200 text-slate-500 hover:border-wake-400'
+              }`}
+            >
+              Todos
+            </button>
+            {gruposDaSubcategoriaAtiva.map((g) => (
+              <button
+                key={g.id}
+                onClick={() => setGrupoAtivoId(g.id)}
+                className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                  grupoAtivoId === g.id
+                    ? 'border-brass-500 bg-brass-200/30 text-hull-900'
+                    : 'border-foam-200 text-slate-500 hover:border-wake-400'
+                }`}
+              >
+                {g.nome}
               </button>
             ))}
           </div>

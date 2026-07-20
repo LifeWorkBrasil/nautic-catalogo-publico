@@ -2,6 +2,7 @@ import { supabase } from './supabase'
 import type {
   CategoriaProduto,
   SubcategoriaProduto,
+  GrupoProduto,
   ProdutoPublico,
   FotoProduto,
   ProdutoItemIncluso,
@@ -16,6 +17,12 @@ export async function listCategorias(): Promise<CategoriaProduto[]> {
 
 export async function listSubcategorias(): Promise<SubcategoriaProduto[]> {
   const { data, error } = await supabase.from('subcategorias_produto').select('*').order('ordem')
+  if (error) throw error
+  return data ?? []
+}
+
+export async function listGrupos(): Promise<GrupoProduto[]> {
+  const { data, error } = await supabase.from('grupos_produto').select('*').order('ordem')
   if (error) throw error
   return data ?? []
 }

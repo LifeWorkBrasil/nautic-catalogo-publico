@@ -12,6 +12,13 @@ export interface SubcategoriaProduto {
   vendido_como_esta: boolean
 }
 
+export interface GrupoProduto {
+  id: string
+  subcategoria_id: string
+  nome: string
+  ordem: number
+}
+
 export interface ProdutoPublico {
   id: string
   nome: string
@@ -19,6 +26,7 @@ export interface ProdutoPublico {
   preco_base: number
   comprimento: number | null
   subcategoria_id: string
+  grupo_id: string | null
   ano: number | null
   motorizacao_tipo: string | null
   motorizacao_potencia: string | null
