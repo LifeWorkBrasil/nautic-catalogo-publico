@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, EMPRESA_ID } from './supabase'
 import type {
   CategoriaProduto,
   SubcategoriaProduto,
@@ -11,19 +11,31 @@ import type {
 } from '../types'
 
 export async function listCategorias(): Promise<CategoriaProduto[]> {
-  const { data, error } = await supabase.from('categorias_produto').select('*').order('ordem')
+  const { data, error } = await supabase
+    .from('categorias_produto')
+    .select('*')
+    .eq('empresa_id', EMPRESA_ID)
+    .order('ordem')
   if (error) throw error
   return data ?? []
 }
 
 export async function listSubcategorias(): Promise<SubcategoriaProduto[]> {
-  const { data, error } = await supabase.from('subcategorias_produto').select('*').order('ordem')
+  const { data, error } = await supabase
+    .from('subcategorias_produto')
+    .select('*')
+    .eq('empresa_id', EMPRESA_ID)
+    .order('ordem')
   if (error) throw error
   return data ?? []
 }
 
 export async function listGrupos(): Promise<GrupoProduto[]> {
-  const { data, error } = await supabase.from('grupos_produto').select('*').order('ordem')
+  const { data, error } = await supabase
+    .from('grupos_produto')
+    .select('*')
+    .eq('empresa_id', EMPRESA_ID)
+    .order('ordem')
   if (error) throw error
   return data ?? []
 }
@@ -37,8 +49,8 @@ export async function listCamposPersonalizados(): Promise<CampoPersonalizado[]> 
 export async function listProdutos(): Promise<ProdutoPublico[]> {
   const [{ data: produtos, error: produtosError }, { data: fotos, error: fotosError }] =
     await Promise.all([
-      supabase.from('produtos_publicos').select('*').order('nome'),
-      supabase.from('fotos_produto').select('produto_id, url_imagem, principal'),
+      supabase.from('produtos_publicos').select('*').eq('empresa_id', EMPRESA_ID).order('nome'),
+      supabase.from('fotos_produto').select('produto_id, url_imagem, principal, empresa_id').eq('empresa_id', EMPRESA_ID),
     ])
   if (produtosError) throw produtosError
   if (fotosError) throw fotosError
@@ -83,6 +95,7 @@ export async function getEmpresaConfig(): Promise<EmpresaConfig | null> {
   const { data, error } = await supabase
     .from('empresa_config')
     .select('nome_empresa, logo_url, telefone')
+    .eq('id', EMPRESA_ID)
     .maybeSingle()
   if (error) throw error
   return data
