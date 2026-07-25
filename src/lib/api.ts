@@ -41,7 +41,11 @@ export async function listGrupos(): Promise<GrupoProduto[]> {
 }
 
 export async function listCamposPersonalizados(): Promise<CampoPersonalizado[]> {
-  const { data, error } = await supabase.from('campos_personalizados').select('*').order('ordem')
+  const { data, error } = await supabase
+    .from('campos_personalizados')
+    .select('*')
+    .eq('empresa_id', EMPRESA_ID)
+    .order('ordem')
   if (error) throw error
   return data ?? []
 }
