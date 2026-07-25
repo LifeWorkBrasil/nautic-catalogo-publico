@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Building2 } from 'lucide-react'
-import { listCategorias, listSubcategorias, listGrupos, listProdutos, getEmpresaConfig } from './lib/api'
+import {
+  listCategorias,
+  listSubcategorias,
+  listGrupos,
+  listCamposPersonalizados,
+  listProdutos,
+  getEmpresaConfig,
+} from './lib/api'
 import { montarMensagem, linkWhatsapp } from './lib/whatsapp'
 import ProdutoCard from './components/ProdutoCard'
 import ProdutoDetalhe from './components/ProdutoDetalhe'
@@ -9,6 +16,7 @@ import type {
   CategoriaProduto,
   SubcategoriaProduto,
   GrupoProduto,
+  CampoPersonalizado,
   ProdutoPublico,
   EmpresaConfig,
 } from './types'
@@ -20,6 +28,7 @@ export default function App() {
   const [categorias, setCategorias] = useState<CategoriaProduto[]>([])
   const [subcategorias, setSubcategorias] = useState<SubcategoriaProduto[]>([])
   const [grupos, setGrupos] = useState<GrupoProduto[]>([])
+  const [campos, setCampos] = useState<CampoPersonalizado[]>([])
   const [produtos, setProdutos] = useState<ProdutoPublico[]>([])
   const [empresa, setEmpresa] = useState<EmpresaConfig | null>(null)
 
@@ -32,16 +41,18 @@ export default function App() {
   useEffect(() => {
     async function carregar() {
       try {
-        const [c, s, g, p, e] = await Promise.all([
+        const [c, s, g, cp, p, e] = await Promise.all([
           listCategorias(),
           listSubcategorias(),
           listGrupos(),
+          listCamposPersonalizados(),
           listProdutos(),
           getEmpresaConfig(),
         ])
         setCategorias(c)
         setSubcategorias(s)
         setGrupos(g)
+        setCampos(cp)
         setProdutos(p)
         setEmpresa(e)
         setCategoriaAtivaId((atual) => atual ?? c[0]?.id ?? null)
@@ -77,6 +88,11 @@ export default function App() {
   const produtoAberto = produtos.find((p) => p.id === produtoAbertoId) ?? null
   const subcategoriaDoProdutoAberto = subcategorias.find(
     (s) => s.id === produtoAberto?.subcategoria_id
+  )
+  const camposDoProdutoAberto = campos.filter(
+    (c) =>
+      c.categoria_id === subcategoriaDoProdutoAberto?.categoria_id ||
+      (produtoAberto?.grupo_id && c.grupo_id === produtoAberto.grupo_id)
   )
   const produtosSelecionados = produtos.filter((p) => selecionados.has(p.id))
 
@@ -228,6 +244,7 @@ export default function App() {
         <ProdutoDetalhe
           produto={produtoAberto}
           subcategoria={subcategoriaDoProdutoAberto}
+          campos={camposDoProdutoAberto}
           selecionado={selecionados.has(produtoAberto.id)}
           onToggleSelecao={() => toggleSelecao(produtoAberto.id)}
           onClose={() => setProdutoAbertoId(null)}

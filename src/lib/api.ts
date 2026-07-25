@@ -3,6 +3,7 @@ import type {
   CategoriaProduto,
   SubcategoriaProduto,
   GrupoProduto,
+  CampoPersonalizado,
   ProdutoPublico,
   FotoProduto,
   ProdutoItemIncluso,
@@ -23,6 +24,12 @@ export async function listSubcategorias(): Promise<SubcategoriaProduto[]> {
 
 export async function listGrupos(): Promise<GrupoProduto[]> {
   const { data, error } = await supabase.from('grupos_produto').select('*').order('ordem')
+  if (error) throw error
+  return data ?? []
+}
+
+export async function listCamposPersonalizados(): Promise<CampoPersonalizado[]> {
+  const { data, error } = await supabase.from('campos_personalizados').select('*').order('ordem')
   if (error) throw error
   return data ?? []
 }

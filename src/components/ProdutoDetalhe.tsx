@@ -2,17 +2,31 @@ import { useEffect, useState } from 'react'
 import { X, Check } from 'lucide-react'
 import { listFotosProduto, listItensInclusosProduto } from '../lib/api'
 import { formatBRL } from '../lib/format'
-import type { ProdutoPublico, SubcategoriaProduto, FotoProduto, ProdutoItemIncluso } from '../types'
+import type {
+  ProdutoPublico,
+  SubcategoriaProduto,
+  CampoPersonalizado,
+  FotoProduto,
+  ProdutoItemIncluso,
+} from '../types'
+
+function formatarValorCampo(campo: CampoPersonalizado, valor: string | number | boolean | null): string | null {
+  if (valor === null || valor === undefined || valor === '') return null
+  if (campo.tipo === 'booleano') return valor ? 'Sim' : 'Não'
+  return String(valor)
+}
 
 export default function ProdutoDetalhe({
   produto,
   subcategoria,
+  campos,
   selecionado,
   onToggleSelecao,
   onClose,
 }: {
   produto: ProdutoPublico
   subcategoria: SubcategoriaProduto | undefined
+  campos: CampoPersonalizado[]
   selecionado: boolean
   onToggleSelecao: () => void
   onClose: () => void
@@ -123,6 +137,24 @@ export default function ProdutoDetalhe({
                   </ul>
                 </div>
               )}
+            </div>
+          )}
+
+          {campos.length > 0 && (
+            <div className="rounded-md border border-foam-200 p-4">
+              <p className="mb-2 text-sm font-medium text-hull-900">Informações adicionais</p>
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                {campos.map((campo) => {
+                  const valorFormatado = formatarValorCampo(campo, produto.atributos?.[campo.id] ?? null)
+                  if (valorFormatado === null) return null
+                  return (
+                    <div key={campo.id} className="contents">
+                      <dt className="text-slate-400">{campo.nome}</dt>
+                      <dd className="text-hull-900">{valorFormatado}</dd>
+                    </div>
+                  )
+                })}
+              </dl>
             </div>
           )}
 
