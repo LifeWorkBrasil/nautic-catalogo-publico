@@ -1,5 +1,5 @@
 import { Images, Check } from 'lucide-react'
-import { formatBRL } from '../lib/format'
+import { formatPreco } from '../lib/format'
 import type { ProdutoPublico } from '../types'
 
 export default function ProdutoCard({
@@ -35,7 +35,7 @@ export default function ProdutoCard({
           <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{produto.descricao}</p>
         </button>
         <div className="mt-3 flex items-center justify-between border-t border-foam-200 pt-3">
-          <span className="font-mono text-sm text-hull-900">{formatBRL(produto.preco_base)}</span>
+          <span className="font-mono text-sm text-hull-900">{formatPreco(produto.preco_base)}</span>
           <span className="text-xs text-slate-400">
             {produto.comprimento ? `${produto.comprimento} m` : ''}
           </span>

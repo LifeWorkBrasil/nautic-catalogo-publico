@@ -1,8 +1,8 @@
-import { formatBRL } from './format'
+import { formatPreco } from './format'
 import type { ProdutoPublico } from '../types'
 
 export function montarMensagem(selecionados: ProdutoPublico[]): string {
-  const linhas = selecionados.map((p) => `• ${p.nome} — ${formatBRL(p.preco_base)}`)
+  const linhas = selecionados.map((p) => `• ${p.nome} — ${formatPreco(p.preco_base)}`)
   return `Olá! Tenho interesse nos seguintes itens do catálogo:\n\n${linhas.join('\n')}`
 }
 

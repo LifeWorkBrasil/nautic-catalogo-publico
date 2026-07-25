@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { X, Check } from 'lucide-react'
 import { listFotosProduto, listItensInclusosProduto } from '../lib/api'
-import { formatBRL } from '../lib/format'
+import { formatPreco } from '../lib/format'
 import type {
   ProdutoPublico,
   SubcategoriaProduto,
@@ -159,7 +159,7 @@ export default function ProdutoDetalhe({
           )}
 
           <div className="flex items-center justify-between border-t border-foam-200 pt-4">
-            <span className="font-mono text-lg text-hull-900">{formatBRL(produto.preco_base)}</span>
+            <span className="font-mono text-lg text-hull-900">{formatPreco(produto.preco_base)}</span>
             <button
               onClick={onToggleSelecao}
               className={`flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
