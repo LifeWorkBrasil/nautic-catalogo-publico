@@ -11,4 +11,13 @@ if (!supabaseUrl || !supabaseAnonKey || !EMPRESA_ID) {
   )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Catálogo público: nunca faz login, e não pode herdar a sessão de outro app hospedado no
+// mesmo domínio (github.io/<user>/<repo> compartilha localStorage por domínio, não por path) —
+// sem isso, uma sessão autenticada de outro app faria a RLS filtrar pelo tenant errado.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+  },
+})
