@@ -95,6 +95,17 @@ export async function listItensInclusosProduto(produtoId: string): Promise<Produ
   return data ?? []
 }
 
+export async function criarAvisoReposicao(
+  produtoId: string,
+  nome: string,
+  telefone: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('avisos_reposicao')
+    .insert({ produto_id: produtoId, nome, telefone })
+  if (error) throw error
+}
+
 export async function getEmpresaConfig(): Promise<EmpresaConfig | null> {
   const { data, error } = await supabase
     .from('empresa_config')

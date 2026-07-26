@@ -15,20 +15,27 @@ export default function ProdutoCard({
 }) {
   return (
     <article className="overflow-hidden rounded-md border border-foam-200 bg-white">
-      <button
-        onClick={onAbrir}
-        className="flex h-40 w-full items-center justify-center overflow-hidden bg-hull-900/[0.04] text-slate-400 hover:bg-hull-900/[0.07]"
-      >
-        {produto.foto_principal_url ? (
-          <img
-            src={produto.foto_principal_url}
-            alt={produto.nome}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <Images className="h-6 w-6" strokeWidth={1.5} />
+      <div className="relative">
+        <button
+          onClick={onAbrir}
+          className="flex h-40 w-full items-center justify-center overflow-hidden bg-hull-900/[0.04] text-slate-400 hover:bg-hull-900/[0.07]"
+        >
+          {produto.foto_principal_url ? (
+            <img
+              src={produto.foto_principal_url}
+              alt={produto.nome}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Images className="h-6 w-6" strokeWidth={1.5} />
+          )}
+        </button>
+        {produto.status_estoque === 'esgotado' && (
+          <span className="absolute left-2 top-2 rounded-full bg-hull-900/85 px-2.5 py-1 text-[10px] font-medium text-foam-50">
+            Esgotado
+          </span>
         )}
-      </button>
+      </div>
       <div className="p-4">
         <button onClick={onAbrir} className="text-left">
           <p className="font-display text-lg text-hull-900">{produto.nome}</p>

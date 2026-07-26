@@ -47,6 +47,8 @@ export interface ProdutoPublico {
   horas_uso: string | null
   ultima_revisao: string | null
   atributos: Record<string, string | number | boolean | null>
+  status_estoque: 'disponivel' | 'esgotado' | 'oculto'
+  data_reposicao: string | null
   foto_principal_url?: string
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { X, Check } from 'lucide-react'
-import { listFotosProduto, listItensInclusosProduto } from '../lib/api'
+import { X, Check, BellRing } from 'lucide-react'
+import { listFotosProduto, listItensInclusosProduto, criarAvisoReposicao } from '../lib/api'
 import { formatPreco } from '../lib/format'
 import type {
   ProdutoPublico,
@@ -14,6 +14,67 @@ function formatarValorCampo(campo: CampoPersonalizado, valor: string | number | 
   if (valor === null || valor === undefined || valor === '') return null
   if (campo.tipo === 'booleano') return valor ? 'Sim' : 'Não'
   return String(valor)
+}
+
+function AvisoReposicaoForm({ produtoId }: { produtoId: string }) {
+  const [nome, setNome] = useState('')
+  const [telefone, setTelefone] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [enviado, setEnviado] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+
+  async function enviar() {
+    if (!nome.trim() || !telefone.trim()) return
+    setEnviando(true)
+    setErro(null)
+    try {
+      await criarAvisoReposicao(produtoId, nome.trim(), telefone.trim())
+      setEnviado(true)
+    } catch {
+      setErro('Não foi possível registrar seu pedido. Tente novamente.')
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  if (enviado) {
+    return (
+      <p className="text-xs text-signal-green">
+        Prontinho! Vamos te avisar por WhatsApp assim que este produto voltar ao estoque.
+      </p>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="flex items-center gap-1.5 text-xs font-medium text-hull-900">
+        <BellRing className="h-3.5 w-3.5" strokeWidth={1.75} />
+        Avise-me quando chegar
+      </p>
+      {erro && <p className="text-xs text-signal-red">{erro}</p>}
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          placeholder="Seu nome"
+          className="rounded-md border border-foam-200 px-3 py-2 text-sm text-hull-900 focus:border-wake-400 focus:outline-none"
+        />
+        <input
+          value={telefone}
+          onChange={(e) => setTelefone(e.target.value)}
+          placeholder="Seu WhatsApp"
+          className="rounded-md border border-foam-200 px-3 py-2 text-sm text-hull-900 focus:border-wake-400 focus:outline-none"
+        />
+        <button
+          onClick={enviar}
+          disabled={enviando || !nome.trim() || !telefone.trim()}
+          className="shrink-0 rounded-md bg-hull-900 px-4 py-2 text-xs font-medium text-foam-50 disabled:opacity-50"
+        >
+          {enviando ? 'Enviando…' : 'Avisar'}
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export default function ProdutoDetalhe({
@@ -155,6 +216,18 @@ export default function ProdutoDetalhe({
                   )
                 })}
               </dl>
+            </div>
+          )}
+
+          {produto.status_estoque === 'esgotado' && (
+            <div className="rounded-md border border-foam-200 bg-hull-900/[0.02] p-4">
+              <p className="mb-2 text-xs font-medium text-signal-red">
+                Esgotado
+                {produto.data_reposicao
+                  ? ` — previsão de reposição em ${new Date(produto.data_reposicao + 'T00:00:00').toLocaleDateString('pt-BR')}`
+                  : ''}
+              </p>
+              <AvisoReposicaoForm produtoId={produto.id} />
             </div>
           )}
 
