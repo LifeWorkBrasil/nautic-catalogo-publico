@@ -104,6 +104,7 @@ export default function ProdutoDetalhe({
   }, [produto.id])
 
   const vendidoComoEsta = subcategoria?.vendido_como_esta ?? false
+  const requerMotor = subcategoria?.requer_motor ?? true
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-hull-950/60 p-4">
@@ -135,57 +136,61 @@ export default function ProdutoDetalhe({
 
           <p className="text-sm leading-relaxed text-slate-600">{produto.descricao}</p>
 
-          {vendidoComoEsta && (
+          {vendidoComoEsta && (requerMotor || itensInclusos.length > 0) && (
             <div className="rounded-md border border-foam-200 p-4">
-              <p className="mb-2 text-sm font-medium text-hull-900">
-                Barco vendido como está — dados do checklist
-              </p>
-              <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-                {produto.ano && (
-                  <>
-                    <dt className="text-slate-400">Ano</dt>
-                    <dd className="text-hull-900">{produto.ano}</dd>
-                  </>
-                )}
-                {produto.motorizacao_tipo && (
-                  <>
-                    <dt className="text-slate-400">Motorização</dt>
-                    <dd className="text-hull-900">{produto.motorizacao_tipo}</dd>
-                  </>
-                )}
-                {produto.motorizacao_potencia && (
-                  <>
-                    <dt className="text-slate-400">Potência</dt>
-                    <dd className="text-hull-900">{produto.motorizacao_potencia}</dd>
-                  </>
-                )}
-                {produto.motorizacao_marca_modelo && (
-                  <>
-                    <dt className="text-slate-400">Marca/modelo do motor</dt>
-                    <dd className="text-hull-900">{produto.motorizacao_marca_modelo}</dd>
-                  </>
-                )}
-                {produto.combustivel && (
-                  <>
-                    <dt className="text-slate-400">Combustível</dt>
-                    <dd className="text-hull-900">{produto.combustivel}</dd>
-                  </>
-                )}
-                {produto.horas_uso && (
-                  <>
-                    <dt className="text-slate-400">Horas de uso</dt>
-                    <dd className="text-hull-900">{produto.horas_uso}</dd>
-                  </>
-                )}
-                {produto.ultima_revisao && (
-                  <>
-                    <dt className="text-slate-400">Última revisão</dt>
-                    <dd className="text-hull-900">{produto.ultima_revisao}</dd>
-                  </>
-                )}
-              </dl>
+              {requerMotor && (
+                <>
+                  <p className="mb-2 text-sm font-medium text-hull-900">
+                    Vendido como está — dados do checklist
+                  </p>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                    {produto.ano && (
+                      <>
+                        <dt className="text-slate-400">Ano</dt>
+                        <dd className="text-hull-900">{produto.ano}</dd>
+                      </>
+                    )}
+                    {produto.motorizacao_tipo && (
+                      <>
+                        <dt className="text-slate-400">Motorização</dt>
+                        <dd className="text-hull-900">{produto.motorizacao_tipo}</dd>
+                      </>
+                    )}
+                    {produto.motorizacao_potencia && (
+                      <>
+                        <dt className="text-slate-400">Potência</dt>
+                        <dd className="text-hull-900">{produto.motorizacao_potencia}</dd>
+                      </>
+                    )}
+                    {produto.motorizacao_marca_modelo && (
+                      <>
+                        <dt className="text-slate-400">Marca/modelo do motor</dt>
+                        <dd className="text-hull-900">{produto.motorizacao_marca_modelo}</dd>
+                      </>
+                    )}
+                    {produto.combustivel && (
+                      <>
+                        <dt className="text-slate-400">Combustível</dt>
+                        <dd className="text-hull-900">{produto.combustivel}</dd>
+                      </>
+                    )}
+                    {produto.horas_uso && (
+                      <>
+                        <dt className="text-slate-400">Horas de uso</dt>
+                        <dd className="text-hull-900">{produto.horas_uso}</dd>
+                      </>
+                    )}
+                    {produto.ultima_revisao && (
+                      <>
+                        <dt className="text-slate-400">Última revisão</dt>
+                        <dd className="text-hull-900">{produto.ultima_revisao}</dd>
+                      </>
+                    )}
+                  </dl>
+                </>
+              )}
               {itensInclusos.length > 0 && (
-                <div className="mt-3 border-t border-foam-200 pt-3">
+                <div className={requerMotor ? 'mt-3 border-t border-foam-200 pt-3' : ''}>
                   <p className="mb-1.5 text-xs font-medium text-hull-900">Itens inclusos</p>
                   <ul className="space-y-1 text-xs text-slate-500">
                     {itensInclusos.map((item) => (
